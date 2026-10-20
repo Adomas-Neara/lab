@@ -1,0 +1,12 @@
+{
+  id: "a2b421f5818ba3621917f4"
+  name: "auto_regression_report~AutoRegressionReport"
+  is_tab_panel: true
+  is_floating_panel: false
+  formula:
+    '''
+    make_immutable_record("auto_regression_report~UI").panel
+    '''
+  is_favourite: false
+  properties: {}
+}

@@ -1,0 +1,144 @@
+// @dim=0.1
+
+class(AnalyticsReportDiffWidget,
+
+  state: formula(make_immutable_record("AnalyticsReportDiffState")),
+
+  ui: public_formula(
+    let(
+      selection: state.selection,
+      left: first_non_null(selection.left_report, ""),
+      right: first_non_null(selection.right_report, ""),
+      left_columns: call(state.columns_of, report_title: left),
+      right_columns: call(state.columns_of, report_title: right),
+      only_left: exclude(left_columns, right_columns),
+      only_right: exclude(right_columns, left_columns),
+      shared_columns: intersect(left_columns, right_columns),
+      column: first_non_null(selection.column, ""),
+      join_column: first_non_null(selection.join_column, ""),
+      ui_panel(
+        "Analytics Report Diff",
+        ui_properties_panel(
+          ui_properties_row("Baseline report", ui_layout_vertical(
+            ui_input_select(selection, "left_report",
+              options: state.available_reports, selection: "single"),
+          )),
+          ui_properties_row("Comparison report", ui_layout_vertical(
+            ui_input_select(selection, "right_report",
+              options: state.available_reports, selection: "single"),
+          )),
+        ),
+        ui_mixed(
+          ui_button("Swap", state.swap_reports_action, mode: "secondary"),
+          ui_button("Clear", state.clear_reports_action, mode: "secondary"),
+        ),
+        if(
+          len(state.available_reports) = 0,
+            ui_mixed("No analytics reports found in this project."),
+          or(left = "", right = ""),
+            ui_mixed("Pick a report on each side to compare."),
+          left = right,
+            ui_mixed("❌ Both sides point at the same report — pick two different ones."),
+          or(len(only_left) > 0, len(only_right) > 0),
+            ui_layout_vertical(
+              ui_mixed("❌ Columns do not match — these reports cannot be compared."),
+              ui_properties_table(
+                make_props(
+                  "Only in baseline", text_join(", ", true, only_left),
+                  "Only in comparison", text_join(", ", true, only_right),
+                ),
+                filter_empty: true,
+              ),
+            ),
+          ui_layout_vertical(
+            ui_properties_panel(
+              ui_properties_row("Field to analyse", ui_layout_vertical(
+                ui_input_select(selection, "column",
+                  options: shared_columns, selection: "single"),
+              )),
+              ui_properties_row("ID join", ui_layout_vertical(
+                ui_input_select(selection, "join_column",
+                  options: shared_columns, selection: "single"),
+              )),
+            ),
+            if(
+              or(column = "", join_column = ""),
+                ui_mixed("Pick a field to analyse and an ID field to match rows by."),
+              column = join_column,
+                ui_mixed("❌ The analysis field and the ID join field must differ."),
+              let(
+                left_map: call(state.value_map_of,
+                  report_title: left, id_column: join_column, value_column: column),
+                right_map: call(state.value_map_of,
+                  report_title: right, id_column: join_column, value_column: column),
+                common_ids: intersect(map_keys(left_map), map_keys(right_map)),
+                total: len(common_ids),
+                kind: call(state.kind_of,
+                  values: filter_nulls(
+                    concat_list(map_values(left_map), map_values(right_map)))),
+                verdicts: broadcast(id: common_ids,
+                  let(
+                    l: lower(map_lookup(left_map, id, "")),
+                    r: lower(map_lookup(right_map, id, "")),
+                    if(
+                      kind = "boolean",
+                        if(and(l = "true", r = "false"), "true_to_false",
+                           and(l = "false", r = "true"), "false_to_true",
+                           "unchanged"),
+                      kind = "number",
+                        let(delta: parse_num(r, 0.0) - parse_num(l, 0.0),
+                          if(delta < 0.0, "decrease", delta > 0.0, "increase", "no_change")),
+                      if(l = r, "unchanged", "changed"),
+                    ),
+                  )),
+                tally: lambda(verdict: type_only("" & ""),
+                  len(filter(verdicts, broadcast(v: verdicts, v = verdict)))),
+                stat: lambda(n: type_only(0),
+                  text_unit(1.0 * n, "", 0) & "  ("
+                    & text_unit(if(total = 0, 0.0, 100.0 * n / total), "%", 1) & ")"),
+                ui_layout_vertical(
+                  ui_properties_table(
+                    make_props(
+                      "Rows matched on ID", total,
+                      "Baseline unique IDs", len(map_keys(left_map)),
+                      "Comparison unique IDs", len(map_keys(right_map)),
+                      "Detected type", kind,
+                    )
+                  ),
+                  if(
+                    total = 0,
+                      ui_mixed("❌ No rows share an ID — pick a different ID join field."),
+                    kind = "boolean",
+                      ui_properties_table(
+                        make_props(
+                          "true → false", call(stat, n: call(tally, verdict: "true_to_false")),
+                          "false → true", call(stat, n: call(tally, verdict: "false_to_true")),
+                          "Total changed", call(stat,
+                            n: call(tally, verdict: "true_to_false")
+                               + call(tally, verdict: "false_to_true")),
+                        )
+                      ),
+                    kind = "number",
+                      ui_properties_table(
+                        make_props(
+                          "Decreased (< 0)", call(stat, n: call(tally, verdict: "decrease")),
+                          "No change (= 0)", call(stat, n: call(tally, verdict: "no_change")),
+                          "Increased (> 0)", call(stat, n: call(tally, verdict: "increase")),
+                        )
+                      ),
+                    ui_properties_table(
+                      make_props(
+                        "Changed", call(stat, n: call(tally, verdict: "changed")),
+                        "Unchanged", call(stat, n: call(tally, verdict: "unchanged")),
+                      )
+                    ),
+                  ),
+                )
+              ),
+            ),
+          ),
+        ),
+      )
+    )
+  ),
+)

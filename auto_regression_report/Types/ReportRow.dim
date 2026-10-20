@@ -1,0 +1,11 @@
+// @dim=0.1
+
+class(ReportRow,
+
+  /// A whole report row as an untyped property bag, so columns can be read by a
+  /// name chosen at runtime. `make_field_mapping` needs const source names, so a
+  /// per-column mapping is impossible; mapping the bag once and reading it with
+  /// `get_prop` is the way to keep the column dynamic. The type is borrowed from
+  /// `gis_properties` because the properties type has no standalone spelling.
+  props: formula(type_only(model().Poles[0].gis_properties)),
+)

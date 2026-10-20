@@ -1,0 +1,8 @@
+// @dim=0.1
+
+class(UI,
+
+  panel: public_formula(
+    make_immutable_record("AnalyticsReportDiffWidget").ui
+  ),
+)

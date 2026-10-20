@@ -1,0 +1,1 @@
+Don't make separate formulas for every single thing, use a let statement instead, especially if the variable is simple, intermediary and being used a single time.

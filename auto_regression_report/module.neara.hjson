@@ -1,0 +1,15 @@
+{
+  organization_module_ref: null
+  title: "Auto Regression"
+  key: "auto_regression_report"
+  description: ""
+  lock: "locked"
+  language_enhancement_config: {
+    language_enhancements: [
+      "eval-err"
+      "nac"
+      "field-err"
+    ]
+  }
+  translation_data_table: null
+}

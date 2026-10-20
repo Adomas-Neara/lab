@@ -1,0 +1,89 @@
+// @dim=0.1
+
+class(AnalyticsReportDiffState,
+
+  selection: public_formula(model().u_report_diff_selection),
+
+  available_reports: public_formula(sort(model().AnalyticsReports[].title)),
+
+  report_named: public_formula(
+    lambda(report_title: type_only(nullable("" & "")),
+      find(model().AnalyticsReports, model().AnalyticsReports[].title = report_title))
+  ),
+
+  columns_of: public_formula(
+    lambda(report_title: type_only(nullable("" & "")),
+      let(
+        report: call(report_named, report_title: report_title),
+        if(report = null,
+          empty_list("" & ""),
+          sort(filter_nulls(not_null(report).Columns[].title))),
+      ))
+  ),
+
+  /// One report's rows as id -> value, read through a data view over the
+  /// report's backing analytics layer.
+  value_map_of: public_formula(
+    lambda(
+      report_title: type_only(nullable("" & "")),
+      id_column: type_only(nullable("" & "")),
+      value_column: type_only(nullable("" & "")),
+      let(
+        report: call(report_named, report_title: report_title),
+        ref: if(report = null, null, index(not_null(report).ServerReports, 0)),
+        empty: map(keys: empty_list("" & ""), values: empty_list("" & "")),
+        if(
+          or(ref = null, id_column = null, id_column = "",
+             value_column = null, value_column = ""),
+          empty,
+          let(
+            rows: fetch_all_entities(
+              make_data_view(
+                "auto_regression_report~ReportRow",
+                source: make_vector_layer_source(
+                  dataset_id: not_null(ref).dataset_id,
+                  layer_name: not_null(ref).report_name,
+                ),
+                field_mapping: make_field_mapping(props: "properties"),
+              ),
+              error_threshold_count: 10000,
+            ),
+            map(
+              keys: broadcast(row: rows, get_prop(row.props, not_null(id_column), "text")),
+              values: broadcast(row: rows, get_prop(row.props, not_null(value_column), "text")),
+            ),
+          ),
+        ),
+      ))
+  ),
+
+  /// Infers how to analyse a column from the values themselves: the report
+  /// metadata carries no column types, so "boolean" / "number" / "text" is
+  /// decided by what every non-blank value parses as. The two `parse_num`
+  /// defaults disagree only when the text is not a number at all.
+  kind_of: public_formula(
+    lambda(
+      values: type_only(empty_list("" & "")),
+      let(
+        present: broadcast(v: filter(values, broadcast(x: values, x <> "")), lower(v)),
+        if(
+          len(present) = 0, "text",
+          all(broadcast(v: present, or(v = "true", v = "false"))), "boolean",
+          all(broadcast(v: present, parse_num(v, 0.0) = parse_num(v, 1.0))), "number",
+          "text",
+        ),
+      ))
+  ),
+
+  swap_reports_action: public_formula(
+    make_field_mutation(
+      selection,
+      left_report: selection.right_report,
+      right_report: selection.left_report,
+    )
+  ),
+
+  clear_reports_action: public_formula(
+    make_field_mutation(selection, left_report: "", right_report: "", column: "")
+  ),
+)

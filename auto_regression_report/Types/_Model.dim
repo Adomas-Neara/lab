@@ -1,0 +1,14 @@
+// @dim=0.1
+
+class_extension(~Model,
+
+  u_report_diff_selection: public_formula(
+    make_dynamic_record(
+      "U_AnalyticsReportDiffSelection",
+      left_report: "" & "",
+      right_report: "" & "",
+      column: "" & "",
+      join_column: "" & "",
+    )
+  ),
+)

@@ -1,0 +1,143 @@
+{
+  "reports": [
+    {
+      "id": "",
+      "d": "",
+      "dn": "",
+      "c": 0,
+      "n": "ground_clearance~Spans nosie to cond",
+      "f": [
+        {
+          "f": "catenary_constant",
+          "a": "Catenary Constant",
+          "ts": { "type": "r", "u": "m", "decimalPlaces": 2 },
+          "d": null
+        },
+        {
+          "f": "min.x",
+          "a": "Min X",
+          "ts": { "type": "r", "u": "m", "decimalPlaces": 2 },
+          "d": null
+        },
+        {
+          "f": "min.y",
+          "a": "Min Y",
+          "ts": { "type": "r", "u": "m", "decimalPlaces": 2 },
+          "d": null
+        },
+        {
+          "f": "min.z",
+          "a": "Min Z",
+          "ts": { "type": "r", "u": "m", "decimalPlaces": 2 },
+          "d": null
+        },
+        {
+          "f": "horizontal_length",
+          "a": "Horizontal Length",
+          "ts": { "type": "r", "u": "m", "decimalPlaces": 2 },
+          "d": null
+        },
+        {
+          "f": "ground_clearance~u_volume",
+          "a": "Volume",
+          "ts": { "type": "t" },
+          "d": null
+        },
+        {
+          "f": "ground_clearance~u_cond_points",
+          "a": "Cond Points",
+          "ts": { "type": "t" },
+          "d": null
+        },
+        {
+          "f": "ground_clearance~u_all_cond_points",
+          "a": "All Cond Points",
+          "ts": { "type": "t" },
+          "d": null
+        },
+        {
+          "f": "ground_clearance~u_cond_noise_points",
+          "a": "Cond Noise Points",
+          "ts": { "type": "t" },
+          "d": null
+        }
+      ],
+      "s": "processing"
+    },
+    {
+      "id": "",
+      "d": "",
+      "dn": "",
+      "c": 0,
+      "n": "SpanStacks2",
+      "f": [
+        {
+          "f": "u_cond_points",
+          "a": "Cond Points",
+          "ts": { "type": "t" },
+          "d": null
+        },
+        {
+          "f": "u_all_cond_points",
+          "a": "All Cond Points",
+          "ts": { "type": "t" },
+          "d": null
+        },
+        {
+          "f": "u_cond_noise_points",
+          "a": "Cond Noise Points",
+          "ts": { "type": "t" },
+          "d": null
+        },
+        {
+          "f": "u_points_to_remove",
+          "a": "Points To Remove",
+          "ts": { "type": "t" },
+          "d": null
+        },
+        {
+          "f": "clearance_area",
+          "a": "Clearance Area",
+          "ts": { "type": "r", "u": "m^2", "decimalPlaces": 2 },
+          "d": null
+        },
+        { "f": "top_span", "a": "Top Span", "ts": { "type": "t" }, "d": null },
+        { "f": "pole1", "a": "Pole1", "ts": { "type": "t" }, "d": null },
+        { "f": "pole2", "a": "Pole2", "ts": { "type": "t" }, "d": null },
+        {
+          "f": "length",
+          "a": "Length",
+          "ts": { "type": "r", "u": "m", "decimalPlaces": 2 },
+          "d": null
+        },
+        { "f": "num_spans", "a": "Num Spans", "ts": { "type": "i" }, "d": null }
+      ],
+      "s": "processing"
+    },
+    {
+      "id": "",
+      "d": "",
+      "dn": "",
+      "c": 0,
+      "n": "Spatial Log",
+      "f": [
+        { "f": "level", "a": "Level", "ts": { "type": "t" }, "d": null },
+        {
+          "f": "tags",
+          "a": "Tags",
+          "ts": { "type": "l", "i": { "type": "t" } },
+          "d": null
+        },
+        { "f": "message", "a": "Message", "ts": { "type": "t" }, "d": null },
+        {
+          "f": "entity_ids",
+          "a": "Entity Ids",
+          "ts": { "type": "l", "i": { "type": "t" } },
+          "d": null
+        }
+      ],
+      "s": "processing"
+    }
+  ],
+  "partitionConfig": null
+}
