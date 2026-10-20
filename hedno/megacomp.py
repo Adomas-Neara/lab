@@ -1,3 +1,18 @@
+"""Field-by-field diff of two report CSVs.
+
+Usage:
+	python megacomp.py a.csv b.csv [--key ID] [--out diff.csv]
+
+Rows are matched by --key (default ID), falling back to row order if the key is missing.
+Fields present in only one CSV, or whose detected type (boolean, int, real, string) differs
+between A and B, are reported and dropped. Each remaining field gets a status per row:
+	boolean      unchanged | true -> false | false -> true
+	int / real   = | < | >   (A vs B, reals equal within EPSILON)
+	string       = | !=
+	any          null_mismatch when only one side is empty
+Writes the diff CSV (default <a>_vs_<b>.csv) plus a .txt copy of the printed summary.
+"""
+
 from __future__ import annotations
 
 import argparse
